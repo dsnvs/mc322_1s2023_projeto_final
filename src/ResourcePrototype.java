@@ -1,6 +1,7 @@
 public abstract class ResourcePrototype {
   public final ResourceType type;
   public final String id;
+  public Visibility visibility;
 
   public ResourcePrototype(ResourceType type, String id) {
     this.type = type;
