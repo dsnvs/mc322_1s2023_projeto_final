@@ -14,7 +14,7 @@ public class Product extends ResourcePrototype implements PublicView<Product> {
   @PublicField
   private String productType;
   private String tags;
-
+  
   public Product(String shopName, String name, String description, String vendor, String productType, String tags) {
     super(type, shopName, Visibility.PUBLIC);
     this.name = name;
