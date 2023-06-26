@@ -8,14 +8,14 @@ public class App {
   public static void main(String[] args) throws Exception {
     Gson gson = new Gson();
     Server server = new Server();
-    AccessTokenWithPrivateKey adminToken = server.createShop("Shop 1", "Address 1");
+    AccessTokenWithPrivateKey adminToken = server.createShop("Shop 2", "Address 1");
 
     System.out.println(adminToken.getPrivateKey());
     System.out.println(adminToken.getAccessToken());
-    System.out.println(server.findShop("Shop 1").getName());
+    System.out.println(server.findShop("Shop 2").getName());
     System.out.println(gson.toJson(server.findShop("Shop 1")));
 
-
+    
 
 
 /*

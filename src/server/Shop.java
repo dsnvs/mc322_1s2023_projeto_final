@@ -1,10 +1,13 @@
 package server;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import webserver.common.UserAccessToken;
 
 import util.AccessToken;
 import util.GlobalID;
+import util.Permission;
 
 public class Shop {
   // The name is the global ID of the shop.
@@ -18,7 +21,7 @@ public class Shop {
   public Shop(String name, String address, AccessToken adminAccessToken) {
     this.name = name;
     this.address = address;
-    
+
     this.accessToken = new ArrayList<AccessToken>();
     this.accessToken.add(adminAccessToken);
 
@@ -43,9 +46,9 @@ public class Shop {
     this.address = address;
   }
 
-  public void setAccessToken(List<AccessToken> accessToken) {
+  protected void setAccessToken(List<AccessToken> accessToken) {
     this.accessToken = accessToken;
-  } 
+  }
 
   public String getName() {
     return name;
@@ -55,9 +58,34 @@ public class Shop {
     return address;
   }
 
-  public List<AccessToken> getAccessToken() {
+  protected List<AccessToken> getAccessToken() {
     return accessToken;
   }
 
+  private AccessToken findAccessToken(String publicKey) {
+    for (AccessToken token : accessToken) {
+      if (token.getPublicKey().equals(publicKey)) {
+        return token;
+      }
+    }
+    return null;
+  }
 
+  public boolean isAdmin(UserAccessToken userAccessToken) {
+    AccessToken internalAccessToken = findAccessToken(userAccessToken.getPublicKey());
+    if (internalAccessToken != null && internalAccessToken.validatePrivateKey(userAccessToken.getPrivateKey())) {
+      return internalAccessToken.isAdmin();
+    } else {
+      return false;
+    }
+  }
+
+  public boolean hasPermission(UserAccessToken userAccessToken, Permission permission) {
+    AccessToken internalAccessToken = findAccessToken(userAccessToken.getPublicKey());
+    if (internalAccessToken != null && internalAccessToken.validatePrivateKey(userAccessToken.getPrivateKey())) {
+      return internalAccessToken.hasPermission(permission);
+    } else {
+      return false;
+    }
+  }
 }

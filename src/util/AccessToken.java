@@ -95,7 +95,7 @@ public class AccessToken {
     return reversedPublicKey + (new Random().nextInt(100) + 1);
   }
 
-  private static String hashPrivateKey(String privateKey) {
+  public static String hashPrivateKey(String privateKey) {
     try {
       MessageDigest digest = MessageDigest.getInstance("SHA-256");
       byte[] hashedBytes = digest.digest(privateKey.getBytes(StandardCharsets.UTF_8));
