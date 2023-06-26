@@ -1,6 +1,9 @@
+package util;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import java.util.Random;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -13,9 +16,10 @@ import java.security.NoSuchAlgorithmException;
  */
 
 public class AccessToken {
-  
+
   // The separator is used for a string representation of an access token.
-  // I use this particular string as the separator because it should be invalid for any of the fields.
+  // I use this particular string as the separator because it should be invalid
+  // for any of the fields.
 
   private static final String SEPARATOR = "-AccessToken-";
   private final String publicKey;
@@ -47,15 +51,27 @@ public class AccessToken {
     this.permissions = permissions;
     this.publicKey = publicKey;
     this.hashedPrivateKey = hashedPrivateKey;
-    this.isAdmin = isAdmin;
+    this.isAdmin = false;
   }
 
-  public static AccessTokenWithPrivateKey generateAccessToken(String shopName, List<Permission> permissions, boolean isAdmin) {
+  public static AccessTokenWithPrivateKey generateAccessToken(String shopName, List<Permission> permissions,
+      boolean isAdmin) {
     String publicKey = generatePublicKey();
     String privateKey = generatePrivateKey(publicKey);
     String hashedPrivateKey = hashPrivateKey(privateKey);
     AccessToken accessToken = new AccessToken(shopName, permissions, publicKey, hashedPrivateKey, isAdmin);
     return new AccessTokenWithPrivateKey(accessToken, privateKey);
+  }
+
+  /*
+   * This method generates an access token with admin permissions.
+   * which means that the access token has write permissions for all resource types.
+   */
+
+  public static AccessTokenWithPrivateKey generateAdminAccessToken(String shopName) {
+    List<Permission> permissions = Permission.allPermissions();
+
+    return generateAccessToken(shopName, permissions, true);
   }
 
   private static String generatePublicKey() {
@@ -117,30 +133,39 @@ public class AccessToken {
     return this.hashedPrivateKey.equals(hashPrivateKey(privateKey));
   }
 
+  @Override
+  public String toString() {
+    String permissionsString = permissions.stream()
+        .map(Permission::toString)
+        .collect(Collectors.joining(","));
 
-    @Override
-    public String toString() {
-        String permissionsString = permissions.stream()
-            .map(Permission::toString)
-            .collect(Collectors.joining(","));
+    return publicKey + SEPARATOR + shopName + SEPARATOR + hashedPrivateKey + SEPARATOR + isAdmin + SEPARATOR
+        + permissionsString;
+  }
 
-        return publicKey + SEPARATOR + shopName + SEPARATOR + hashedPrivateKey + SEPARATOR + isAdmin + SEPARATOR + permissionsString;
+  public static AccessToken fromString(String tokenString) {
+    String[] parts = tokenString.split(SEPARATOR);
+    if (parts.length != 5) {
+      throw new IllegalArgumentException("Invalid token string");
     }
 
-    public static AccessToken fromString(String tokenString) {
-        String[] parts = tokenString.split(SEPARATOR);
-        if (parts.length != 5) {
-            throw new IllegalArgumentException("Invalid token string");
-        }
+    String publicKey = parts[0];
+    String shopName = parts[1];
+    String hashedPrivateKey = parts[2];
+    boolean isAdmin = Boolean.parseBoolean(parts[3]);
+    List<Permission> permissions = Arrays.stream(parts[4].split(","))
+        .map(Permission::fromString)
+        .collect(Collectors.toList());
 
-        String publicKey = parts[0];
-        String shopName = parts[1];
-        String hashedPrivateKey = parts[2];
-        boolean isAdmin = Boolean.parseBoolean(parts[3]);
-        List<Permission> permissions = Arrays.stream(parts[4].split(","))
-            .map(Permission::fromString)
-            .collect(Collectors.toList());
+    return new AccessToken(shopName, permissions, publicKey, hashedPrivateKey, isAdmin);
+  }
 
-        return new AccessToken(shopName, permissions, publicKey, hashedPrivateKey, isAdmin);
-    }
+  /*
+   * This needs to be cloneable
+   */
+
+  @Override
+  public AccessToken clone() {
+    return new AccessToken(this.shopName, this.permissions, this.publicKey, this.hashedPrivateKey, this.isAdmin);
+  }
 }

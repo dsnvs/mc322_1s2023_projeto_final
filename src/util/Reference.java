@@ -1,4 +1,8 @@
+package util;
+import resource.ResourcePrototype;
+
 public class Reference<T extends ResourcePrototype> {
+  
 /*  public <T extends ResourcePrototype> T getObject(String resourceId) {
     
   }
