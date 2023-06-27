@@ -2,15 +2,15 @@ package webserver.routers.requests;
 
 public abstract class AdminRequests implements Request {
   private String shopName;
-  private String userAccessTokenString;
+  // private String userAccessTokenString;
 
   public String getShopName() {
     return shopName;
   }
 
-  public String getUserAccessTokenString() {
+  /* public String getUserAccessTokenString() {
     return userAccessTokenString;
-  }
+  } */
 
   public class GetShopDetailsRequest extends AdminRequests {
 
